@@ -3,6 +3,21 @@ from .. import db
 from flask import jsonify, abort, make_response, request, url_for
 # jsonify -- 格式化响应给客户端的数据
 from app.models import Tasks
+from flask_httpauth import HTTPBasicAuth
+
+auth = HTTPBasicAuth()
+
+
+@auth.get_password
+def get_password(username):
+    if username == 'ok':
+        return 'python'
+    return None
+
+
+@auth.error_handler
+def unauthorized():
+    return make_response(jsonify({'error': 'Unauthorized access'}), 401)
 
 
 def make_public_task(task):
@@ -14,6 +29,7 @@ def make_public_task(task):
 
 
 @api.route('/tasks', methods=['GET'])
+@auth.login_required
 def index():
     tasks = Tasks.query.all()
     return jsonify({'tasks': list(map(make_public_task, tasks))})
