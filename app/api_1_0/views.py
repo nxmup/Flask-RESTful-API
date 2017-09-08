@@ -1,5 +1,6 @@
 from . import api
-from flask import jsonify, abort, make_response
+from .. import db
+from flask import jsonify, abort, make_response, request
 # jsonify -- 格式化响应给客户端的数据
 from app.models import Tasks
 
@@ -15,6 +16,18 @@ def get_task(task_id):
     task = Tasks.query.filter_by(id=task_id).first()
     if not task:
         abort(404)
+    return jsonify({'task': task.get_json()})
+
+
+@api.route('/tasks', methods=['POST'])
+def create_task():
+    if not request.json or not 'title' in request.json:
+        abort(400)
+    task = Tasks(title=request.json['title'],
+                 description=request.json.get('description', ''),
+                 done=False)
+    db.session.add(task)
+    db.session.commit()
     return jsonify({'task': task.get_json()})
 
 
