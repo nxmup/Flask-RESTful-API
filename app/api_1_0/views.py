@@ -31,6 +31,26 @@ def create_task():
     return jsonify({'task': task.get_json()})
 
 
+@api.route('/tasks/<int:task_id>', methods=['PUT'])
+def update_task(task_id):
+    task = Tasks.query.filter_by(id=task_id).first()
+    if not task:
+        abort(404)
+    if not request.json:
+        abort(400)
+    if 'title' in request.json and type(request.json['title']) is not str:
+        abort(400)
+    if 'description' in request.json and type(request.json['description']) is not str:
+        abort(400)
+    if 'done' in request.json and type(request.json['done']) is not bool:
+        abort(400)
+    task.title = request.json.get('title', task.title)
+    task.description = request.json.get('description', task.description)
+    task.done = request.json.get('done', task.done)
+    db.session.commit()
+    return jsonify({'task': task.get_json()})
+
+
 @api.app_errorhandler(404)
 def page_not_found(error):
     return make_response(jsonify({'error': "Not Found"}), 404)
