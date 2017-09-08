@@ -25,3 +25,32 @@ HTTP状态码|名称|说明
 405|Method not allowed|指定资源不支持请求使用的方法
 500|Internal server error|处理请求的过程中发生意外错误
 
+## 使用方法(Usage)
+首先进入 shell 环境为数据库添加默认数据
+> python manage.py shell  
+> db.drop_all()  
+> db.create_all()  
+> Tasks.init()  
+> db.session.commit()  
+> exit()
+
+运行项目：
+> python manage.py runserver
+
+接下来开始验证：  
+> GET(all tasks -- cannot access because of security authorization):  
+> curl -i http://localhost:5000/api/v1.0/tasks  
+> GET(all tasks -- use built-in username and password to access)  
+> curl -i -u ok:python http://localhost:5000/api/v1.0/tasks
+> 
+> GET(single task):  
+> curl -i http://localhost:5000/api/v1.0/tasks/1  
+>
+> POST:  
+>curl -i -H "Content-Type: application/json" -X POST -d '{"title":"Read a book"}' http://localhost:5000/api/v1.0/tasks  
+>
+> PUT:  
+>curl -i -H "Content-Type: application/json" -X PUT -d '{"done":true}' http://localhost:5000/api/v1.0/tasks/2  
+>
+> DELETE:  
+>curl -i -X DELETE http://localhost:5000/api/v1.0/tasks/2  
