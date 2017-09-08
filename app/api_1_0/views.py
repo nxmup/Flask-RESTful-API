@@ -1,5 +1,6 @@
 from . import api
-from flask import jsonify, abort
+from flask import jsonify, abort, make_response
+# jsonify -- 格式化响应给客户端的数据
 from app.models import Tasks
 
 
@@ -15,3 +16,8 @@ def get_task(task_id):
     if not task:
         abort(404)
     return jsonify({'task': task.get_json()})
+
+
+@api.app_errorhandler(404)
+def page_not_found(error):
+    return make_response(jsonify({'error': "Not Found"}), 404)
