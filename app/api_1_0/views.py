@@ -1,14 +1,22 @@
 from . import api
 from .. import db
-from flask import jsonify, abort, make_response, request
+from flask import jsonify, abort, make_response, request, url_for
 # jsonify -- 格式化响应给客户端的数据
 from app.models import Tasks
+
+
+def make_public_task(task):
+    new_task = {'uri': url_for('api.get_task', task_id=task.id, _external=True),
+                'title': task.title,
+                'description': task.description,
+                'done': task.done}
+    return new_task
 
 
 @api.route('/tasks', methods=['GET'])
 def index():
     tasks = Tasks.query.all()
-    return jsonify({'tasks': list(map(lambda task: task.get_json(), tasks))})
+    return jsonify({'tasks': list(map(make_public_task, tasks))})
 
 
 @api.route('/tasks/<int:task_id>', methods=['GET'])
